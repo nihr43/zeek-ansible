@@ -1,0 +1,55 @@
+- name: role packages
+  package:
+    name:
+      - gpg
+
+- name: add suse obs apt signing key
+  ansible.builtin.apt_key:
+    url: https://download.opensuse.org/repositories/security:zeek/Debian_11/Release.key
+    state: present
+
+- name: add zeek repo
+  ansible.builtin.apt_repository:
+    repo: 'deb http://download.opensuse.org/repositories/security:/zeek/Debian_12/ /'
+    state: present
+
+- name: install zeek
+  package:
+    name:
+      - zeek
+
+- name: ensure zeek in PATH
+  ansible.builtin.lineinfile:
+    path: /etc/profile.d/zeek.sh
+    regexp: '^export'
+    line: 'export PATH=$PATH:/opt/zeek/bin'
+    create: true
+
+- name: set zeek interface
+  ansible.builtin.lineinfile:
+    path: /opt/zeek/etc/node.cfg
+    regexp: '^interface'
+    line: 'interface={{zeek_interface}}'
+
+- name: set LogRotationInterval
+  ansible.builtin.lineinfile:
+    path: /opt/zeek/etc/zeekctl.cfg
+    regexp: '^LogRotationInterval'
+    line: 'LogRotationInterval = 360'
+
+- name: set LogExpireInterval
+  ansible.builtin.lineinfile:
+    path: /opt/zeek/etc/zeekctl.cfg
+    regexp: '^LogExpireInterval'
+    line: 'LogExpireInterval = 1hr'
+
+- name: land unit file
+  ansible.builtin.copy:
+    src: zeek.service
+    dest: /etc/systemd/system/zeek.service
+
+- name: enable zeek
+  service:
+    name: zeek
+    enabled: true
+    state: started
