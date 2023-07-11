@@ -46,8 +46,8 @@
 - name: set json log format
   ansible.builtin.lineinfile:
     path: /opt/zeek/share/zeek/site/local.zeek
-    regexp: '^redef LogAscii::use_json'
-    line: 'redef LogAscii::use_json = T;'
+    regexp: '^@load policy/tuning/json-logs.zeek'
+    line: '@load policy/tuning/json-logs.zeek'
 
 - name: land unit file
   ansible.builtin.copy:
