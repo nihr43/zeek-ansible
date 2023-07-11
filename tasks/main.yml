@@ -48,6 +48,17 @@
     src: zeek.service
     dest: /etc/systemd/system/zeek.service
 
+- name: mount zeek logs on tmpfs
+  ansible.builtin.lineinfile:
+    path: /etc/fstab
+    regexp: '^tmpfs.*/opt/zeek/logs'
+    line: 'tmpfs	/opt/zeek/logs	tmpfs	rw,nodev,nosuid,size=4G	0	0'
+  register: fstab
+
+- name: reboot
+  ansible.builtin.reboot:
+  when: "fstab.changed"
+
 - name: enable zeek
   service:
     name: zeek
