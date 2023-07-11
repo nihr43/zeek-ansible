@@ -43,6 +43,12 @@
     regexp: '^LogExpireInterval'
     line: 'LogExpireInterval = 1hr'
 
+- name: set json log format
+  ansible.builtin.lineinfile:
+    path: /opt/zeek/share/zeek/site/local.zeek
+    regexp: '^redef LogAscii::use_json'
+    line: 'redef LogAscii::use_json = T;'
+
 - name: land unit file
   ansible.builtin.copy:
     src: zeek.service
